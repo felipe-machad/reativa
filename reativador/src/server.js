@@ -11,7 +11,8 @@ const scheduler = require("./scheduler");
 
 const app = express();
 app.use(express.json());
-
+// ---------- healthcheck (EasyPanel usa isso) ----------
+app.get("/health", (req, res) => res.json({ ok: true }));
 const SENHA = process.env.ADMIN_SENHA || "";
 
 // ---------- auth simples (Basic Auth com a senha do env) ----------
@@ -135,8 +136,7 @@ app.post("/webhook/evolution", (req, res) => {
   res.json({ ok: true });
 });
 
-// ---------- healthcheck (EasyPanel usa isso) ----------
-app.get("/health", (req, res) => res.json({ ok: true }));
+
 
 const PORT = parseInt(process.env.PORT || "3000", 10);
 app.listen(PORT, () => {
