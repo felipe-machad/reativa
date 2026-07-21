@@ -1,0 +1,13 @@
+{
+  "name": "reativador",
+  "version": "1.0.0",
+  "description": "Mini app autonomo de reativacao de clientes sumidos (Bling + Evolution API)",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "node-cron": "^3.0.3"
+  }
+}

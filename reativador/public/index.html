@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reativador</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, "Segoe UI", Roboto, sans-serif; background: #f4f5f7; color: #1a1a1a; padding: 24px 16px; }
+  .wrap { max-width: 640px; margin: 0 auto; }
+  h1 { font-size: 22px; margin-bottom: 4px; }
+  .sub { color: #777; font-size: 13px; margin-bottom: 20px; }
+  .card { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+  label { display: block; font-size: 13px; font-weight: 600; margin: 14px 0 6px; }
+  label:first-of-type { margin-top: 0; }
+  .dica { font-weight: 400; color: #888; font-size: 12px; }
+  input[type=text], input[type=url], textarea { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; font-family: inherit; }
+  textarea { min-height: 110px; resize: vertical; }
+  .linha { display: flex; gap: 8px; align-items: center; }
+  .numero-item { display: flex; gap: 8px; margin-bottom: 8px; }
+  .numero-item input { flex: 1; }
+  button { border: 0; border-radius: 8px; padding: 10px 16px; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .btn-principal { background: #16a34a; color: #fff; width: 100%; margin-top: 16px; padding: 13px; }
+  .btn-secundario { background: #e8e8e8; color: #333; }
+  .btn-remover { background: #fee; color: #c00; padding: 10px 12px; }
+  .toggle { display: flex; align-items: center; justify-content: space-between; }
+  .switch { position: relative; width: 52px; height: 30px; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider { position: absolute; inset: 0; background: #ccc; border-radius: 30px; transition: .2s; cursor: pointer; }
+  .slider:before { content: ""; position: absolute; height: 24px; width: 24px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: .2s; }
+  input:checked + .slider { background: #16a34a; }
+  input:checked + .slider:before { transform: translateX(22px); }
+  .status { font-size: 13px; padding: 8px 12px; border-radius: 8px; margin-bottom: 12px; }
+  .status.ok { background: #e7f6ec; color: #166534; }
+  .status.warn { background: #fef3cd; color: #8a6d00; }
+  .log { font-size: 12px; font-family: monospace; background: #1a1a1a; color: #9ee; border-radius: 8px; padding: 12px; max-height: 220px; overflow-y: auto; white-space: pre-wrap; }
+  .msg { font-size: 13px; margin-top: 8px; min-height: 18px; }
+  .msg.ok { color: #16a34a; } .msg.erro { color: #c00; }
+  .acoes { display: flex; gap: 8px; margin-top: 12px; }
+  .acoes button { flex: 1; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🔁 Reativador</h1>
+  <p class="sub">Mensagens automáticas pra clientes que sumiram</p>
+
+  <div id="statusBling" class="status warn">Verificando conexão com o Bling…</div>
+
+  <div class="card">
+    <div class="toggle">
+      <div>
+        <strong>Campanha ativa</strong>
+        <div class="dica">Ligado = o app envia sozinho, a cada rodada</div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="ativo">
+        <span class="slider"></span>
+      </label>
+    </div>
+  </div>
+
+  <div class="card">
+    <label>Texto da mensagem <span class="dica">use {nome} pra colocar o nome do cliente</span></label>
+    <textarea id="texto"></textarea>
+
+    <label>Imagem <span class="dica">link direto (.jpg/.png) — deixe vazio pra mandar só texto</span></label>
+    <input type="url" id="imagemUrl" placeholder="https://raw.githubusercontent.com/…/catalogo.jpg">
+
+    <label>Link no fim da mensagem <span class="dica">opcional — ex: link do catálogo ou do site</span></label>
+    <input type="url" id="hyperlink" placeholder="https://minhaloja.com.br/catalogo">
+  </div>
+
+  <div class="card">
+    <label>Outros números pra receber a campanha <span class="dica">além dos clientes sumidos do Bling</span></label>
+    <div id="listaNumeros"></div>
+    <button class="btn-secundario" onclick="adicionarNumero()">+ Adicionar número</button>
+  </div>
+
+  <button class="btn-principal" onclick="salvar()">Salvar tudo</button>
+  <div id="msgSalvar" class="msg"></div>
+
+  <div class="card" style="margin-top: 20px;">
+    <strong>Testar antes de ativar</strong>
+    <label>Mandar a mensagem de teste pra:</label>
+    <div class="linha">
+      <input type="text" id="numeroTeste" placeholder="51999999999" style="flex:1">
+      <button class="btn-secundario" onclick="testar()">Enviar teste</button>
+    </div>
+    <div class="acoes">
+      <button class="btn-secundario" onclick="rodarAgora()">▶ Rodar uma rodada agora</button>
+    </div>
+    <div id="msgTeste" class="msg"></div>
+  </div>
+
+  <div class="card">
+    <strong>Últimos acontecimentos</strong>
+    <div class="dica" id="resumo" style="margin: 6px 0 10px;"></div>
+    <div class="log" id="log">carregando…</div>
+  </div>
+</div>
+
+<script>
+let config = null;
+
+function el(id) { return document.getElementById(id); }
+
+function adicionarNumero(numero = "", nome = "") {
+  const div = document.createElement("div");
+  div.className = "numero-item";
+  div.innerHTML = `
+    <input type="text" placeholder="51999999999" value="${numero}" data-campo="numero">
+    <input type="text" placeholder="Nome (opcional)" value="${nome}" data-campo="nome">
+    <button class="btn-remover" onclick="this.parentElement.remove()">✕</button>`;
+  el("listaNumeros").appendChild(div);
+}
+
+function lerNumeros() {
+  return [...document.querySelectorAll(".numero-item")].map(div => ({
+    numero: div.querySelector('[data-campo="numero"]').value,
+    nome: div.querySelector('[data-campo="nome"]').value,
+  })).filter(n => n.numero.trim());
+}
+
+async function carregar() {
+  const r = await fetch("/api/status");
+  const d = await r.json();
+  config = d.config;
+
+  el("ativo").checked = config.ativo;
+  el("texto").value = config.texto;
+  el("imagemUrl").value = config.imagemUrl;
+  el("hyperlink").value = config.hyperlink;
+  el("listaNumeros").innerHTML = "";
+  (config.numerosExtras || []).forEach(n => adicionarNumero(n.numero, n.nome));
+
+  const s = el("statusBling");
+  if (d.blingConectado) {
+    s.className = "status ok";
+    s.textContent = "✅ Bling conectado";
+  } else {
+    s.className = "status warn";
+    s.innerHTML = '⚠️ Bling não conectado — <a href="/auth/bling">clique aqui pra conectar</a>';
+  }
+
+  el("resumo").textContent = `${d.enviosTotal} envio(s) registrados · ${d.optOutTotal} opt-out(s)`;
+  el("log").textContent = d.log.map(l => `${l.quando.slice(0,16).replace("T"," ")}  ${l.msg}`).join("\n") || "nenhum evento ainda";
+}
+
+async function salvar() {
+  const body = {
+    ativo: el("ativo").checked,
+    texto: el("texto").value,
+    imagemUrl: el("imagemUrl").value,
+    hyperlink: el("hyperlink").value,
+    numerosExtras: lerNumeros(),
+  };
+  const r = await fetch("/api/config", {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
+  });
+  const m = el("msgSalvar");
+  if (r.ok) { m.className = "msg ok"; m.textContent = "Salvo! ✔"; }
+  else { m.className = "msg erro"; m.textContent = "Erro ao salvar."; }
+  setTimeout(() => m.textContent = "", 3000);
+  carregar();
+}
+
+async function testar() {
+  const m = el("msgTeste");
+  m.className = "msg"; m.textContent = "Enviando teste…";
+  const r = await fetch("/api/teste", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ numero: el("numeroTeste").value }),
+  });
+  const d = await r.json();
+  if (d.ok) { m.className = "msg ok"; m.textContent = "Teste enviado! Confere no WhatsApp."; }
+  else { m.className = "msg erro"; m.textContent = "Falhou: " + (d.motivo || "erro"); }
+}
+
+async function rodarAgora() {
+  const m = el("msgTeste");
+  await fetch("/api/rodar-agora", { method: "POST" });
+  m.className = "msg ok";
+  m.textContent = "Rodada iniciada — acompanhe no log abaixo (atualiza em alguns segundos).";
+  setTimeout(carregar, 5000);
+}
+
+carregar();
+setInterval(carregar, 30000); // atualiza o log a cada 30s
+</script>
+</body>
+</html>
