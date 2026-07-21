@@ -90,7 +90,9 @@ app.post("/api/rodar-agora", protegido, async (req, res) => {
 app.get("/auth/bling", protegido, (req, res) => {
   res.redirect(urlAutorizacao());
 });
-
+function urlCallback() {
+     return `${process.env.APP_URL}/auth/bling/callback`;
+}
 app.get("/auth/bling/callback", async (req, res) => {
   try {
     const code = req.query.code;
