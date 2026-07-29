@@ -1,13 +1,18 @@
 {
   "name": "reativador",
-  "version": "1.0.0",
-  "description": "Mini app autonomo de reativacao de clientes sumidos (Bling + Evolution API)",
+  "version": "2.0.0",
+  "description": "Cadastro de campanhas de WhatsApp (planilha + reativacao automatica no Bling) com ritmo seguro, sem banco de dados",
   "main": "src/server.js",
   "scripts": {
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "teste": "node testes/smoke.js"
   },
   "dependencies": {
     "express": "^4.19.2",
-    "node-cron": "^3.0.3"
+    "multer": "^2.0.1",
+    "node-cron": "^4.6.0"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

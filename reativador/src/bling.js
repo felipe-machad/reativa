@@ -1,11 +1,10 @@
 // ============================================================
-// Bling API v3 com OAuth completo:
-//   - urlAutorizacao()      -> pra onde mandar o usuário clicar
-//   - trocarCodigo(code)    -> troca o code do callback por tokens
-//   - tokenValido()         -> devolve access token, renovando se preciso
-//   - getPedidosVendas()    -> vendas por período
-//   - getContato(id)        -> detalhe do contato (telefone)
-// Tokens ficam em tokens.json (via store.js).
+// bling.js — Bling API v3 com OAuth completo:
+//   urlAutorizacao()      -> pra onde mandar a pessoa clicar
+//   trocarCodigo(code)    -> troca o code do callback por tokens
+//   getPedidosVendas()    -> vendas do período (com paginação)
+//   getContato(id)        -> detalhe do contato (telefone)
+// Tokens ficam em tokens.json (via store.js) e renovam sozinhos.
 // ============================================================
 const { lerTokens, gravarTokens, registrarLog } = require("./store");
 
@@ -16,6 +15,10 @@ const TOKEN_URL = "https://www.bling.com.br/Api/v3/oauth/token";
 const CLIENT_ID = process.env.BLING_CLIENT_ID || "";
 const CLIENT_SECRET = process.env.BLING_CLIENT_SECRET || "";
 const APP_URL = (process.env.APP_URL || "").replace(/\/$/, "");
+const MAX_PAGINAS = parseInt(process.env.BLING_MAX_PAGINAS || "5", 10); // 5 x 100 = 500 pedidos por janela
+const PAUSA_PAGINA_MS = parseInt(process.env.BLING_PAUSA_MS || "400", 10);
+
+const dormir = (ms) => new Promise((r) => setTimeout(r, ms));
 
 function urlCallback() {
   return `${APP_URL}/auth/bling/callback`;
@@ -27,7 +30,12 @@ function urlAutorizacao() {
     client_id: CLIENT_ID,
     state: "reativador",
   });
+  if (APP_URL) params.set("redirect_uri", urlCallback());
   return `${AUTH_URL}?${params}`;
+}
+
+function configurado() {
+  return !!(CLIENT_ID && CLIENT_SECRET);
 }
 
 async function chamarTokenEndpoint(body) {
@@ -49,10 +57,7 @@ async function chamarTokenEndpoint(body) {
 }
 
 async function trocarCodigo(code) {
-  const data = await chamarTokenEndpoint({
-    grant_type: "authorization_code",
-    code,
-  });
+  const data = await chamarTokenEndpoint({ grant_type: "authorization_code", code });
   gravarTokens({
     accessToken: data.access_token,
     refreshToken: data.refresh_token,
@@ -64,14 +69,9 @@ async function trocarCodigo(code) {
 async function tokenValido() {
   const t = lerTokens();
   if (!t) throw new Error("Bling não conectado. Acesse /auth/bling pra autorizar.");
-
   if (Date.now() < t.expiraEm) return t.accessToken;
 
-  // expirou -> renova com o refresh token
-  const data = await chamarTokenEndpoint({
-    grant_type: "refresh_token",
-    refresh_token: t.refreshToken,
-  });
+  const data = await chamarTokenEndpoint({ grant_type: "refresh_token", refresh_token: t.refreshToken });
   gravarTokens({
     accessToken: data.access_token,
     refreshToken: data.refresh_token || t.refreshToken,
@@ -85,17 +85,31 @@ async function blingGet(pathRel, params = {}) {
   const token = await tokenValido();
   const query = new URLSearchParams(params).toString();
   const resp = await fetch(`${BASE}${pathRel}${query ? "?" + query : ""}`, {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
+    signal: AbortSignal.timeout(30000),
   });
-  if (resp.status === 429) throw new Error("Bling: limite de requisições (429).");
+  if (resp.status === 429) throw new Error("Bling: limite de requisições (429). Tenta na próxima rodada.");
   if (!resp.ok) throw new Error(`Bling: erro ${resp.status} em ${pathRel}`);
   const body = await resp.json();
-  const d = body?.data;
+  const d = body && body.data;
   return Array.isArray(d) ? d : d ? [d] : [];
 }
 
+// pagina até MAX_PAGINAS (o Bling devolve no máximo 100 por página)
 async function getPedidosVendas(dataInicial, dataFinal) {
-  return blingGet("/pedidos/vendas", { dataInicial, dataFinal, limite: "100" });
+  const todos = [];
+  for (let pagina = 1; pagina <= MAX_PAGINAS; pagina++) {
+    const lote = await blingGet("/pedidos/vendas", {
+      dataInicial,
+      dataFinal,
+      limite: "100",
+      pagina: String(pagina),
+    });
+    todos.push(...lote);
+    if (lote.length < 100) break;
+    await dormir(PAUSA_PAGINA_MS);
+  }
+  return todos;
 }
 
 async function getContato(id) {
@@ -107,4 +121,12 @@ function blingConectado() {
   return !!lerTokens();
 }
 
-module.exports = { urlAutorizacao, urlCallback, trocarCodigo, getPedidosVendas, getContato, blingConectado };
+module.exports = {
+  urlAutorizacao,
+  urlCallback,
+  trocarCodigo,
+  getPedidosVendas,
+  getContato,
+  blingConectado,
+  configurado,
+};

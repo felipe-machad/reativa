@@ -3,190 +3,996 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Reativador</title>
+<title>Reativador · Oceania</title>
+<link rel="icon" href="img/favicon.png">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, "Segoe UI", Roboto, sans-serif; background: #f4f5f7; color: #1a1a1a; padding: 24px 16px; }
-  .wrap { max-width: 640px; margin: 0 auto; }
-  h1 { font-size: 22px; margin-bottom: 4px; }
-  .sub { color: #777; font-size: 13px; margin-bottom: 20px; }
-  .card { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
-  label { display: block; font-size: 13px; font-weight: 600; margin: 14px 0 6px; }
-  label:first-of-type { margin-top: 0; }
-  .dica { font-weight: 400; color: #888; font-size: 12px; }
-  input[type=text], input[type=url], textarea { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; font-family: inherit; }
-  textarea { min-height: 110px; resize: vertical; }
-  .linha { display: flex; gap: 8px; align-items: center; }
-  .numero-item { display: flex; gap: 8px; margin-bottom: 8px; }
-  .numero-item input { flex: 1; }
-  button { border: 0; border-radius: 8px; padding: 10px 16px; font-size: 14px; font-weight: 600; cursor: pointer; }
-  .btn-principal { background: #16a34a; color: #fff; width: 100%; margin-top: 16px; padding: 13px; }
-  .btn-secundario { background: #e8e8e8; color: #333; }
-  .btn-remover { background: #fee; color: #c00; padding: 10px 12px; }
-  .toggle { display: flex; align-items: center; justify-content: space-between; }
-  .switch { position: relative; width: 52px; height: 30px; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --tinta: #0f172a;
+    --tinta-2: #475569;
+    --tinta-3: #94a3b8;
+    --fundo: #f1f5f9;
+    --borda: #e2e8f0;
+    --verde: #16a34a;
+    --verde-claro: #e7f6ec;
+    --ambar: #b45309;
+    --ambar-claro: #fef3c7;
+    --vermelho: #b91c1c;
+    --vermelho-claro: #fee2e2;
+    --azul: #1d4ed8;
+    --azul-claro: #dbeafe;
+    --raio: 14px;
+  }
+  body { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--fundo); color: var(--tinta); font-size: 15px; line-height: 1.45; }
+
+  /* ---------- topo ---------- */
+  header.topo { background: var(--tinta); color: #fff; padding: 18px 16px; }
+  .topo-inner { max-width: 900px; margin: 0 auto; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .topo img { height: 42px; }
+  .topo h1 { font-size: 18px; font-weight: 700; letter-spacing: .3px; }
+  .topo .sub { font-size: 12px; color: #94a3b8; }
+  .topo .direita { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+  .pill { font-size: 12px; font-weight: 600; padding: 5px 10px; border-radius: 999px; background: #1e293b; color: #cbd5e1; white-space: nowrap; }
+  .pill.ok { background: #064e3b; color: #6ee7b7; }
+  .pill.alerta { background: #78350f; color: #fcd34d; cursor: pointer; }
+  .pill.ruim { background: #7f1d1d; color: #fca5a5; }
+
+  .wrap { max-width: 900px; margin: 0 auto; padding: 20px 16px 60px; }
+
+  /* ---------- blocos ---------- */
+  .card { background: #fff; border: 1px solid var(--borda); border-radius: var(--raio); padding: 18px; margin-bottom: 16px; }
+  .card h2 { font-size: 15px; display: flex; align-items: center; gap: 8px; }
+  .card h2 .conta { font-size: 12px; color: var(--tinta-3); font-weight: 500; }
+  .secao-titulo { font-size: 12px; text-transform: uppercase; letter-spacing: .8px; color: var(--tinta-3); font-weight: 700; margin: 26px 0 10px; display: flex; align-items: center; gap: 10px; }
+  .secao-titulo::after { content: ""; flex: 1; height: 1px; background: var(--borda); }
+
+  label { display: block; font-size: 13px; font-weight: 600; margin: 14px 0 5px; }
+  .dica { font-weight: 400; color: var(--tinta-2); font-size: 12px; }
+  .dica-bloco { font-size: 12px; color: var(--tinta-2); background: #f8fafc; border: 1px dashed var(--borda); border-radius: 10px; padding: 10px 12px; margin-top: 8px; }
+  input[type=text], input[type=url], input[type=number], textarea, select {
+    width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; font-family: inherit; background: #fff; color: var(--tinta);
+  }
+  input:focus, textarea:focus, select:focus { outline: 2px solid #bfdbfe; border-color: #60a5fa; }
+  textarea { min-height: 120px; resize: vertical; }
+  .grade { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+  .linha { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .linha > input { flex: 1; min-width: 140px; }
+
+  button { border: 0; border-radius: 10px; padding: 10px 14px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  .b-principal { background: var(--verde); color: #fff; }
+  .b-escuro { background: var(--tinta); color: #fff; }
+  .b-neutro { background: #e2e8f0; color: #334155; }
+  .b-perigo { background: var(--vermelho-claro); color: var(--vermelho); }
+  .b-fantasma { background: transparent; color: var(--tinta-2); border: 1px solid var(--borda); }
+  .b-pequeno { padding: 7px 10px; font-size: 13px; }
+
+  a { color: var(--azul); }
+
+  /* ---------- interruptor ---------- */
+  .switch { position: relative; width: 48px; height: 28px; flex: 0 0 auto; display: inline-block; }
   .switch input { opacity: 0; width: 0; height: 0; }
-  .slider { position: absolute; inset: 0; background: #ccc; border-radius: 30px; transition: .2s; cursor: pointer; }
-  .slider:before { content: ""; position: absolute; height: 24px; width: 24px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: .2s; }
-  input:checked + .slider { background: #16a34a; }
-  input:checked + .slider:before { transform: translateX(22px); }
-  .status { font-size: 13px; padding: 8px 12px; border-radius: 8px; margin-bottom: 12px; }
-  .status.ok { background: #e7f6ec; color: #166534; }
-  .status.warn { background: #fef3cd; color: #8a6d00; }
-  .log { font-size: 12px; font-family: monospace; background: #1a1a1a; color: #9ee; border-radius: 8px; padding: 12px; max-height: 220px; overflow-y: auto; white-space: pre-wrap; }
-  .msg { font-size: 13px; margin-top: 8px; min-height: 18px; }
-  .msg.ok { color: #16a34a; } .msg.erro { color: #c00; }
-  .acoes { display: flex; gap: 8px; margin-top: 12px; }
-  .acoes button { flex: 1; }
+  .slider { position: absolute; inset: 0; background: #cbd5e1; border-radius: 30px; transition: .2s; cursor: pointer; }
+  .slider::before { content: ""; position: absolute; height: 22px; width: 22px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: .2s; }
+  input:checked + .slider { background: var(--verde); }
+  input:checked + .slider::before { transform: translateX(20px); }
+
+  /* ---------- campanhas ---------- */
+  .campanha { background: #fff; border: 1px solid var(--borda); border-radius: var(--raio); padding: 16px; margin-bottom: 12px; }
+  .campanha .cabeca { display: flex; align-items: flex-start; gap: 10px; }
+  .campanha .nome { font-size: 16px; font-weight: 700; }
+  .campanha .meta { font-size: 12px; color: var(--tinta-2); margin-top: 3px; }
+  .tag { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; text-transform: uppercase; letter-spacing: .4px; }
+  .tag.bling { background: var(--azul-claro); color: var(--azul); }
+  .tag.planilha { background: #ede9fe; color: #6d28d9; }
+  .tag.rascunho { background: #f1f5f9; color: var(--tinta-2); }
+  .tag.pronta { background: var(--verde-claro); color: #166534; }
+  .tag.concluida { background: #f1f5f9; color: var(--tinta-2); }
+  .tag.enviando { background: var(--ambar-claro); color: var(--ambar); }
+  .barra { height: 8px; background: #eef2f7; border-radius: 6px; overflow: hidden; margin: 12px 0 6px; }
+  .barra > i { display: block; height: 100%; background: var(--verde); transition: width .3s; }
+  .numeros { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--tinta-2); }
+  .numeros b { color: var(--tinta); }
+  .acoes { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+
+  /* ---------- editor ---------- */
+  /* cabeça e rodapé fixos, corpo rolando no meio — funciona igual no celular */
+  .fundo-modal { position: fixed; inset: 0; background: rgba(15,23,42,.55); display: none; align-items: center; justify-content: center; padding: 16px 12px; overflow: hidden; z-index: 50; }
+  .fundo-modal.aberto { display: flex; }
+  .modal { background: var(--fundo); border-radius: 16px; width: 100%; max-width: 720px; max-height: calc(100vh - 32px); display: flex; flex-direction: column; overflow: hidden; }
+  .modal-topo { flex: 0 0 auto; background: #fff; padding: 16px 18px; border-bottom: 1px solid var(--borda); display: flex; align-items: center; gap: 10px; }
+  .modal-topo h3 { font-size: 16px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .modal-corpo { flex: 1 1 auto; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 18px; }
+  .modal-pe { flex: 0 0 auto; background: #fff; border-top: 1px solid var(--borda); padding: 14px 18px; display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .dias { display: flex; gap: 6px; flex-wrap: wrap; }
+  .dia { padding: 8px 0; width: 44px; text-align: center; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 12px; font-weight: 700; cursor: pointer; user-select: none; background: #fff; color: var(--tinta-2); }
+  .dia.on { background: var(--tinta); color: #fff; border-color: var(--tinta); }
+
+  .previa-img { margin-top: 10px; display: none; }
+  .previa-img img { max-height: 150px; border-radius: 10px; border: 1px solid var(--borda); background: #fff; }
+
+  .aviso { font-size: 13px; padding: 10px 12px; border-radius: 10px; margin-top: 10px; display: none; }
+  .aviso.ok { background: var(--verde-claro); color: #166534; display: block; }
+  .aviso.erro { background: var(--vermelho-claro); color: var(--vermelho); display: block; }
+  .aviso.neutro { background: #f1f5f9; color: var(--tinta-2); display: block; }
+
+  .log { font-size: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; background: #0b1220; color: #a5f3fc; border-radius: 10px; padding: 12px; max-height: 280px; overflow-y: auto; white-space: pre-wrap; word-break: break-word; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .chip { background: #f1f5f9; border: 1px solid var(--borda); border-radius: 999px; padding: 4px 10px; font-size: 12px; display: flex; align-items: center; gap: 6px; }
+  .chip button { background: none; color: var(--vermelho); padding: 0 2px; font-size: 14px; line-height: 1; }
+  .item-numero { display: flex; gap: 8px; margin-bottom: 8px; }
+  .item-numero input { flex: 1; }
+  .rodape { text-align: center; font-size: 12px; color: var(--tinta-3); margin-top: 30px; }
+  @media (max-width: 560px) { .topo .direita { width: 100%; } .acoes button { flex: 1; } }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>🔁 Reativador</h1>
-  <p class="sub">Mensagens automáticas pra clientes que sumiram</p>
 
-  <div id="statusBling" class="status warn">Verificando conexão com o Bling…</div>
-
-  <div class="card">
-    <div class="toggle">
-      <div>
-        <strong>Campanha ativa</strong>
-        <div class="dica">Ligado = o app envia sozinho, a cada rodada</div>
-      </div>
-      <label class="switch">
-        <input type="checkbox" id="ativo">
-        <span class="slider"></span>
-      </label>
+<header class="topo">
+  <div class="topo-inner">
+    <img src="img/logo-branco.png" alt="Oceania">
+    <div>
+      <h1>Reativador</h1>
+      <div class="sub">Campanhas de WhatsApp · Oceania</div>
     </div>
+    <div class="direita" id="pills"></div>
   </div>
+</header>
 
+<div class="wrap">
+
+  <!-- ============ PROTEÇÃO DO NÚMERO ============ -->
+  <div class="secao-titulo">Proteção do número</div>
   <div class="card">
-    <label>Texto da mensagem <span class="dica">use {nome} pra colocar o nome do cliente</span></label>
-    <textarea id="texto"></textarea>
+    <h2>🛡️ Ritmo de envio <span class="conta" id="contaDia"></span></h2>
+    <div class="barra" style="margin-top:14px"><i id="barraDia" style="width:0%"></i></div>
+    <div class="dica" id="explicaDia">carregando…</div>
 
-    <label>Imagem <span class="dica">link direto (.jpg/.png) — deixe vazio pra mandar só texto</span></label>
-    <input type="url" id="imagemUrl" placeholder="https://raw.githubusercontent.com/…/catalogo.jpg">
+    <div class="grade" style="margin-top:16px">
+      <div>
+        <label>Máximo por dia <span class="dica">no número</span></label>
+        <input type="number" id="pLimite" min="1" max="2000">
+      </div>
+      <div>
+        <label>Pausa mínima <span class="dica">segundos</span></label>
+        <input type="number" id="pPausaMin" min="3" max="900">
+      </div>
+      <div>
+        <label>Pausa máxima <span class="dica">segundos</span></label>
+        <input type="number" id="pPausaMax" min="3" max="1800">
+      </div>
+    </div>
 
-    <label>Link no fim da mensagem <span class="dica">opcional — ex: link do catálogo ou do site</span></label>
-    <input type="url" id="hyperlink" placeholder="https://minhaloja.com.br/catalogo">
+    <div class="linha" style="margin-top:14px">
+      <label class="switch"><input type="checkbox" id="pAquecimento"><span class="slider"></span></label>
+      <div><strong style="font-size:13px">Aquecimento</strong><div class="dica">Nos primeiros dias manda menos e vai subindo: 20 → 30 → 50 → 70 → 100 → 130 → limite cheio</div></div>
+    </div>
+    <div class="linha" style="margin-top:12px">
+      <label class="switch"><input type="checkbox" id="pVariar"><span class="slider"></span></label>
+      <div><strong style="font-size:13px">Variar a mensagem</strong><div class="dica">Usa as opções <code>{oi|olá}</code> do texto — cada pessoa recebe uma versão diferente</div></div>
+    </div>
+    <div class="linha" style="margin-top:12px">
+      <label class="switch"><input type="checkbox" id="pEmbaralhar"><span class="slider"></span></label>
+      <div><strong style="font-size:13px">Ordem aleatória</strong><div class="dica">Não segue a ordem da planilha, o que parece mais natural</div></div>
+    </div>
+
+    <div class="dica-bloco">
+      Nada sai em bloco: cada campanha manda no máximo o "teto por rodada" e o resto fica pra próxima rodada,
+      com pausa sorteada entre uma mensagem e outra. Uma lista grande leva dias pra sair — e é isso que protege o número.
+    </div>
+
+    <div class="acoes">
+      <button class="b-escuro" onclick="salvarProtecao()">Salvar proteção</button>
+      <button class="b-fantasma b-pequeno" onclick="salvarProtecao(true)">Reiniciar aquecimento</button>
+    </div>
+    <div class="aviso" id="avisoProtecao"></div>
   </div>
 
+  <!-- ============ CAMPANHAS ============ -->
+  <div class="secao-titulo">Campanhas</div>
+  <div id="listaCampanhas"></div>
+  <button class="b-principal" style="width:100%" onclick="abrirEditor(null)">+ Nova campanha</button>
+
+  <!-- ============ MODELO DE PLANILHA ============ -->
+  <div class="secao-titulo">Planilha de contatos</div>
   <div class="card">
-    <label>Outros números pra receber a campanha <span class="dica">além dos clientes sumidos do Bling</span></label>
-    <div id="listaNumeros"></div>
-    <button class="btn-secundario" onclick="adicionarNumero()">+ Adicionar número</button>
-  </div>
-
-  <button class="btn-principal" onclick="salvar()">Salvar tudo</button>
-  <div id="msgSalvar" class="msg"></div>
-
-  <div class="card" style="margin-top: 20px;">
-    <strong>Testar antes de ativar</strong>
-    <label>Mandar a mensagem de teste pra:</label>
-    <div class="linha">
-      <input type="text" id="numeroTeste" placeholder="51999999999" style="flex:1">
-      <button class="btn-secundario" onclick="testar()">Enviar teste</button>
+    <h2>📄 Modelo pronto</h2>
+    <div class="dica" style="margin-top:6px">
+      Duas colunas: <strong>telefone</strong> e <strong>nome</strong>. Baixe o modelo, preencha e suba dentro da campanha.
+      Telefone com DDD; repetidos são enviados uma vez só.
     </div>
     <div class="acoes">
-      <button class="btn-secundario" onclick="rodarAgora()">▶ Rodar uma rodada agora</button>
+      <a href="/api/modelo.xlsx"><button class="b-escuro">⬇ Modelo Excel (.xlsx)</button></a>
+      <a href="/api/modelo.csv"><button class="b-neutro">⬇ Modelo CSV</button></a>
     </div>
-    <div id="msgTeste" class="msg"></div>
   </div>
 
+  <!-- ============ OPT-OUT ============ -->
+  <div class="secao-titulo">Quem pediu para não receber</div>
   <div class="card">
-    <strong>Últimos acontecimentos</strong>
-    <div class="dica" id="resumo" style="margin: 6px 0 10px;"></div>
+    <h2>🚫 Lista de PARE <span class="conta" id="contaOptOut"></span></h2>
+    <div class="dica" style="margin-top:6px">Quem responde <strong>PARE</strong> entra aqui automaticamente e nunca mais recebe, esteja em qualquer planilha.</div>
+    <div class="linha" style="margin-top:12px">
+      <input type="text" id="numeroOptOut" placeholder="51999999999">
+      <button class="b-neutro" onclick="mexerOptOut(false)">Adicionar</button>
+      <button class="b-fantasma" onclick="mexerOptOut(true)">Remover</button>
+    </div>
+    <div class="chips" id="chipsOptOut"></div>
+    <div class="aviso" id="avisoOptOut"></div>
+  </div>
+
+  <!-- ============ LOG ============ -->
+  <div class="secao-titulo">Últimos acontecimentos</div>
+  <div class="card">
     <div class="log" id="log">carregando…</div>
+  </div>
+
+  <!-- ============ BACKUP ============ -->
+  <div class="secao-titulo">Segurança dos dados</div>
+  <div class="card">
+    <h2>💾 Backup</h2>
+    <div class="dica" style="margin-top:6px">
+      Tudo (campanhas, listas, PAREs e configurações) fica em arquivos no volume <code>/data</code>.
+      Baixe um backup de vez em quando: se o volume for perdido ou o app mudar de servidor, você restaura em um clique.
+    </div>
+    <div class="acoes">
+      <a href="/api/backup.json"><button class="b-escuro b-pequeno">⬇ Baixar backup</button></a>
+      <button class="b-neutro b-pequeno" onclick="el('arquivoBackup').click()">⬆ Restaurar backup</button>
+      <input type="file" id="arquivoBackup" accept=".json" style="display:none" onchange="restaurar(this)">
+    </div>
+    <div class="aviso" id="avisoBackup"></div>
+  </div>
+
+  <div class="rodape">Reativador · Oceania — dados guardados em arquivos no volume <code>/data</code></div>
+</div>
+
+<!-- ============ EDITOR ============ -->
+<div class="fundo-modal" id="modal">
+  <div class="modal">
+    <div class="modal-topo">
+      <h3 id="tituloEditor">Campanha</h3>
+      <button class="b-fantasma b-pequeno" onclick="fecharEditor()">✕ Fechar</button>
+    </div>
+    <div class="modal-corpo">
+
+      <div class="card" style="margin-bottom:14px">
+        <label>Nome da campanha</label>
+        <input type="text" id="eNome" placeholder="Ex.: Promoção de julho">
+        <div id="blocoTipo">
+          <label>Tipo</label>
+          <select id="eTipo">
+            <option value="planilha">Lista de planilha (eu subo os contatos)</option>
+          </select>
+          <div class="dica" style="margin-top:6px">A reativação automática do Bling já existe como campanha e não pode ser duplicada.</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:14px">
+        <h2>💬 Mensagem</h2>
+        <label>Texto <span class="dica">use <code>{nome}</code> pro nome da pessoa e <code>{oi|olá|e aí}</code> pra variar</span></label>
+        <textarea id="eTexto"></textarea>
+        <div class="linha" style="margin-top:8px">
+          <button class="b-fantasma b-pequeno" onclick="verPrevia()">👁 Ver como fica</button>
+          <span class="dica" id="contadorTexto"></span>
+        </div>
+        <div class="aviso neutro" id="previaTexto" style="display:none"></div>
+
+        <label style="margin-top:18px">Imagem <span class="dica">opcional — deixe vazio pra mandar só texto</span></label>
+        <div class="dica-bloco">
+          A imagem não fica no nosso servidor. Suba ela num hospedeiro gratuito e cole o link aqui —
+          o link fica salvo na campanha e você pode conferir a qualquer momento se ainda está no ar.
+          <br><br>
+          <strong>Como fazer:</strong> clique em <em>Hospedar imagem no ImgBB</em> → escolha o arquivo → depois de subir,
+          copie o campo <strong>"Link direto"</strong> (termina em .jpg / .png) e cole abaixo.
+        </div>
+        <div class="acoes" style="margin-top:10px">
+          <a href="https://pt-br.imgbb.com/" target="_blank" rel="noopener"><button class="b-escuro b-pequeno">🖼 Hospedar imagem no ImgBB ↗</button></a>
+        </div>
+        <input type="url" id="eImagem" placeholder="https://i.ibb.co/xxxxxxx/catalogo.jpg" style="margin-top:10px" oninput="mostrarPrevia()">
+        <div class="acoes">
+          <button class="b-neutro b-pequeno" onclick="verificarImagem()">🔍 Verificar se o link está válido</button>
+          <button class="b-fantasma b-pequeno" onclick="abrirImagem()">↗ Abrir o link</button>
+        </div>
+        <div class="aviso" id="avisoImagem"></div>
+        <div class="previa-img" id="previaImg"><img id="imgPrevia" alt="prévia"></div>
+
+        <label style="margin-top:18px">Link no fim da mensagem <span class="dica">opcional — catálogo, site, promoção</span></label>
+        <input type="url" id="eLink" placeholder="https://oceania.com.br/catalogo">
+      </div>
+
+      <div class="card" style="margin-bottom:14px" id="cardPlanilha">
+        <h2>📋 Lista de contatos</h2>
+        <div class="aviso neutro" id="resumoPlanilha" style="display:block">nenhuma planilha importada ainda</div>
+        <label>Subir planilha <span class="dica">.xlsx, .xls ou .csv — colunas telefone e nome</span></label>
+        <input type="file" id="eArquivo" accept=".xlsx,.xls,.csv,.txt">
+        <div class="acoes">
+          <button class="b-escuro b-pequeno" onclick="subirPlanilha()">⬆ Importar planilha</button>
+          <a href="/api/modelo.xlsx"><button class="b-neutro b-pequeno" type="button">⬇ Modelo .xlsx</button></a>
+          <a href="/api/modelo.csv"><button class="b-neutro b-pequeno" type="button">⬇ Modelo .csv</button></a>
+        </div>
+        <div class="aviso" id="avisoPlanilha"></div>
+        <div class="acoes" id="acoesPlanilha" style="display:none">
+          <button class="b-fantasma b-pequeno" onclick="baixar('relatorio')">📊 Relatório de envios</button>
+          <button class="b-fantasma b-pequeno" onclick="baixar('original')">📎 Baixar planilha enviada</button>
+          <button class="b-fantasma b-pequeno" onclick="reiniciarLista()">↺ Zerar progresso</button>
+          <button class="b-perigo b-pequeno" onclick="removerPlanilha()">🗑 Remover lista</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:14px" id="cardBling">
+        <h2>🔗 Regra do Bling</h2>
+        <div class="dica" style="margin-top:6px">Compara duas janelas de tempo: quem comprava antes e parou de comprar entra na fila.</div>
+        <label>Tamanho da janela <span class="dica">dias</span></label>
+        <input type="number" id="eJanela" min="7" max="365">
+        <div class="dica" style="margin-top:6px">90 dias = compara os últimos 90 dias com os 90 anteriores.</div>
+      </div>
+
+      <div class="card" style="margin-bottom:14px">
+        <h2>⏱ Quando enviar</h2>
+        <label>Modo</label>
+        <select id="eModo" onchange="atualizarEstimativa()">
+          <option value="agendada">Automática — roda sozinha nos dias e horários abaixo</option>
+          <option value="manual">Manual — só quando eu clicar em Disparar</option>
+        </select>
+        <div class="dica" style="margin-top:6px">
+          No modo manual, ao clicar em Disparar a lista <strong>continua saindo em fatias</strong> nas rodadas seguintes,
+          respeitando os dias/horário abaixo, até acabar. Você pode pausar quando quiser.
+        </div>
+
+        <label style="margin-top:16px">Dias da semana</label>
+        <div class="dias" id="eDias"></div>
+
+        <div class="grade" style="margin-top:14px">
+          <div><label>Das <span class="dica">hora</span></label><input type="number" id="eHoraIni" min="0" max="23" onchange="atualizarEstimativa()"></div>
+          <div><label>Até <span class="dica">hora</span></label><input type="number" id="eHoraFim" min="1" max="24" onchange="atualizarEstimativa()"></div>
+          <div><label>Máx. por rodada</label><input type="number" id="eTeto" min="1" max="200" onchange="atualizarEstimativa()"></div>
+          <div><label>Intervalo entre rodadas <span class="dica">min</span></label><input type="number" id="eIntervalo" min="0" max="10080" onchange="atualizarEstimativa()"></div>
+          <div><label>Não repetir antes de <span class="dica">dias</span></label><input type="number" id="eCooldown" min="0" max="3650"></div>
+        </div>
+        <div class="aviso neutro" id="estimativa" style="display:block">—</div>
+      </div>
+
+      <div class="card" style="margin-bottom:14px">
+        <h2>➕ Números extras <span class="conta">além da lista/Bling</span></h2>
+        <div id="listaExtras"></div>
+        <button class="b-neutro b-pequeno" onclick="addExtra()">+ Adicionar número</button>
+      </div>
+
+      <div class="card" style="margin-bottom:14px">
+        <h2>✅ Testar antes</h2>
+        <label>Mandar a mensagem desta campanha pra:</label>
+        <div class="linha">
+          <input type="text" id="eNumeroTeste" placeholder="51999999999">
+          <button class="b-neutro" onclick="enviarTeste()">Enviar teste</button>
+        </div>
+        <div class="aviso" id="avisoTeste"></div>
+      </div>
+
+      <div class="card">
+        <div class="linha">
+          <label class="switch"><input type="checkbox" id="eAtivo"><span class="slider"></span></label>
+          <div><strong style="font-size:13px">Campanha ativa</strong><div class="dica">No modo automático, ligado = o app envia sozinho</div></div>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-pe">
+      <button class="b-principal" onclick="salvarCampanha()">Salvar campanha</button>
+      <button class="b-escuro" id="btnDisparar" onclick="disparar()">▶ Disparar agora</button>
+      <button class="b-neutro" id="btnPausar" onclick="pausar()">⏸ Pausar</button>
+      <button class="b-perigo" id="btnExcluir" onclick="excluir()" style="margin-left:auto">🗑 Excluir</button>
+    </div>
   </div>
 </div>
 
 <script>
-let config = null;
+// ============================================================
+// estado da tela
+// ============================================================
+let dados = null;        // resposta de /api/status
+let editando = null;     // campanha aberta no editor (null = nova)
+const DIAS = ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"];
+let diasSelecionados = new Set([1, 2, 3, 4, 5]);
 
-function el(id) { return document.getElementById(id); }
+const el = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
-function adicionarNumero(numero = "", nome = "") {
-  const div = document.createElement("div");
-  div.className = "numero-item";
-  div.innerHTML = `
-    <input type="text" placeholder="51999999999" value="${numero}" data-campo="numero">
-    <input type="text" placeholder="Nome (opcional)" value="${nome}" data-campo="nome">
-    <button class="btn-remover" onclick="this.parentElement.remove()">✕</button>`;
-  el("listaNumeros").appendChild(div);
+function mostrarAviso(id, texto, tipo = "neutro") {
+  const a = el(id);
+  a.className = "aviso " + tipo;
+  a.textContent = texto;
+  if (!texto) a.style.display = "none";
 }
 
-function lerNumeros() {
-  return [...document.querySelectorAll(".numero-item")].map(div => ({
-    numero: div.querySelector('[data-campo="numero"]').value,
-    nome: div.querySelector('[data-campo="nome"]').value,
-  })).filter(n => n.numero.trim());
-}
-
-async function carregar() {
-  const r = await fetch("/api/status");
-  const d = await r.json();
-  config = d.config;
-
-  el("ativo").checked = config.ativo;
-  el("texto").value = config.texto;
-  el("imagemUrl").value = config.imagemUrl;
-  el("hyperlink").value = config.hyperlink;
-  el("listaNumeros").innerHTML = "";
-  (config.numerosExtras || []).forEach(n => adicionarNumero(n.numero, n.nome));
-
-  const s = el("statusBling");
-  if (d.blingConectado) {
-    s.className = "status ok";
-    s.textContent = "✅ Bling conectado";
-  } else {
-    s.className = "status warn";
-    s.innerHTML = '⚠️ Bling não conectado — <a href="/auth/bling">clique aqui pra conectar</a>';
-  }
-
-  el("resumo").textContent = `${d.enviosTotal} envio(s) registrados · ${d.optOutTotal} opt-out(s)`;
-  el("log").textContent = d.log.map(l => `${l.quando.slice(0,16).replace("T"," ")}  ${l.msg}`).join("\n") || "nenhum evento ainda";
-}
-
-async function salvar() {
-  const body = {
-    ativo: el("ativo").checked,
-    texto: el("texto").value,
-    imagemUrl: el("imagemUrl").value,
-    hyperlink: el("hyperlink").value,
-    numerosExtras: lerNumeros(),
-  };
-  const r = await fetch("/api/config", {
-    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
+async function api(caminho, opcoes = {}) {
+  const r = await fetch(caminho, {
+    headers: opcoes.body ? { "Content-Type": "application/json" } : {},
+    ...opcoes,
+    body: opcoes.body ? JSON.stringify(opcoes.body) : undefined,
   });
-  const m = el("msgSalvar");
-  if (r.ok) { m.className = "msg ok"; m.textContent = "Salvo! ✔"; }
-  else { m.className = "msg erro"; m.textContent = "Erro ao salvar."; }
-  setTimeout(() => m.textContent = "", 3000);
+  let d = {};
+  try { d = await r.json(); } catch {}
+  if (!r.ok || d.ok === false) throw new Error(d.motivo || `erro ${r.status}`);
+  return d;
+}
+
+// ============================================================
+// carregar tudo
+// ============================================================
+async function carregar() {
+  try {
+    dados = await api("/api/status");
+  } catch (e) {
+    el("log").textContent = "Erro ao carregar: " + e.message;
+    return;
+  }
+  desenharPills();
+  desenharProtecao();
+  desenharCampanhas();
+  desenharOptOut();
+  el("log").textContent =
+    dados.log.map((l) => `${l.quando.slice(0, 16).replace("T", " ")}  ${l.campanha ? "[" + l.campanha + "] " : ""}${l.msg}`).join("\n") ||
+    "nenhum evento ainda";
+}
+
+function desenharPills() {
+  const a = dados.ambiente;
+  const p = [];
+  p.push(`<span class="pill">🕐 ${String(a.relogio.hora).padStart(2, "0")}:${String(a.relogio.minuto).padStart(2, "0")} ${a.fuso.split("/")[1] || ""}</span>`);
+  p.push(`<span class="pill ${dados.dia.saldo > 0 ? "ok" : "alerta"}">📊 hoje ${dados.dia.jaForam}/${dados.dia.limite}</span>`);
+  p.push(a.evolutionConfigurada
+    ? '<span class="pill ok">✅ WhatsApp</span>'
+    : '<span class="pill ruim">⚠️ WhatsApp sem config</span>');
+  p.push(a.blingConectado
+    ? '<span class="pill ok">✅ Bling</span>'
+    : `<span class="pill alerta" onclick="location.href='/auth/bling'">⚠️ conectar Bling</span>`);
+  el("pills").innerHTML = p.join("");
+}
+
+function desenharProtecao() {
+  const p = dados.protecao;
+  el("pLimite").value = p.limiteDiario;
+  el("pPausaMin").value = p.pausaMinSeg;
+  el("pPausaMax").value = p.pausaMaxSeg;
+  el("pAquecimento").checked = !!p.aquecimento;
+  el("pVariar").checked = p.variarMensagem !== false;
+  el("pEmbaralhar").checked = p.embaralhar !== false;
+
+  const d = dados.dia;
+  const pct = d.limite ? Math.min(100, Math.round((d.jaForam / d.limite) * 100)) : 0;
+  el("barraDia").style.width = pct + "%";
+  el("contaDia").textContent = `${d.jaForam} de ${d.limite} mensagens hoje`;
+  const media = Math.round((p.pausaMinSeg + p.pausaMaxSeg) / 2);
+  const porHora = Math.floor(3600 / media);
+  el("explicaDia").innerHTML =
+    `Pausa sorteada entre <b>${p.pausaMinSeg}s</b> e <b>${p.pausaMaxSeg}s</b> — dá cerca de <b>${porHora} mensagens por hora</b> no ritmo atual. ` +
+    (p.aquecimento && p.inicioAquecimento
+      ? `Aquecimento começou em ${p.inicioAquecimento.slice(0, 10).split("-").reverse().join("/")}, limite de hoje: <b>${d.limite}</b>.`
+      : p.aquecimento ? "Aquecimento ligado: o dia 1 começa no primeiro envio." : "Aquecimento desligado.");
+}
+
+async function salvarProtecao(reiniciarAquecimento = false) {
+  try {
+    await api("/api/protecao", {
+      method: "PUT",
+      body: {
+        limiteDiario: el("pLimite").value,
+        pausaMinSeg: el("pPausaMin").value,
+        pausaMaxSeg: el("pPausaMax").value,
+        aquecimento: el("pAquecimento").checked,
+        variarMensagem: el("pVariar").checked,
+        embaralhar: el("pEmbaralhar").checked,
+        reiniciarAquecimento,
+      },
+    });
+    mostrarAviso("avisoProtecao", "Proteção salva ✔", "ok");
+    carregar();
+  } catch (e) {
+    mostrarAviso("avisoProtecao", e.message, "erro");
+  }
+  setTimeout(() => mostrarAviso("avisoProtecao", ""), 4000);
+}
+
+// ============================================================
+// campanhas
+// ============================================================
+function desenharCampanhas() {
+  const div = el("listaCampanhas");
+  if (!dados.campanhas.length) {
+    div.innerHTML = '<div class="card"><div class="dica">Nenhuma campanha ainda.</div></div>';
+    return;
+  }
+  div.innerHTML = dados.campanhas.map(cartaoCampanha).join("");
+}
+
+function cartaoCampanha(c) {
+  const l = c.lista;
+  const totalLista = l ? l.total : null;
+  const feitos = l ? l.enviados + l.erros + l.optout + l.invalidos : 0;
+  const pct = totalLista ? Math.round((feitos / totalLista) * 100) : 0;
+
+  const etiquetaStatus = c.rodandoAgora
+    ? '<span class="tag enviando">enviando…</span>'
+    : c.emAndamento
+    ? '<span class="tag enviando">em andamento</span>'
+    : `<span class="tag ${c.status}">${c.status}</span>`;
+
+  const motivoJanela = !c.janela.ok && (c.ativo || c.emAndamento) ? `<div class="dica" style="margin-top:6px">⏸ esperando: ${esc(c.janela.motivo)}</div>` : "";
+
+  return `
+  <div class="campanha">
+    <div class="cabeca">
+      <div style="flex:1">
+        <div class="nome">${esc(c.nome)}</div>
+        <div class="meta">
+          <span class="tag ${c.tipo}">${c.tipo === "bling" ? "Bling" : "planilha"}</span>
+          ${etiquetaStatus}
+          <span class="tag rascunho">${c.modo === "agendada" ? "automática" : "manual"}</span>
+        </div>
+        <div class="meta">${DIAS.filter((_, i) => (c.diasSemana || []).includes(i)).join(", ")} · ${c.horaInicio}h–${c.horaFim}h · até ${c.tetoPorRodada} por rodada</div>
+        ${motivoJanela}
+      </div>
+      <label class="switch" title="ativar/pausar">
+        <input type="checkbox" ${c.ativo ? "checked" : ""} onchange="alternarAtivo('${c.id}', this.checked)">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    ${totalLista !== null ? `
+      <div class="barra"><i style="width:${pct}%"></i></div>
+      <div class="numeros">
+        <span><b>${l.total}</b> contatos</span>
+        <span><b>${l.enviados}</b> enviados</span>
+        <span><b>${l.pendentes}</b> na fila</span>
+        ${l.erros ? `<span><b>${l.erros}</b> com erro</span>` : ""}
+        ${l.optout ? `<span><b>${l.optout}</b> pediram PARE</span>` : ""}
+        ${l.invalidos ? `<span><b>${l.invalidos}</b> inválidos</span>` : ""}
+      </div>` : `
+      <div class="numeros" style="margin-top:12px">
+        <span><b>${c.stats?.enviados || 0}</b> enviados no total</span>
+        <span>janela de <b>${c.janelaDias}</b> dias</span>
+        <span>não repete antes de <b>${c.cooldownDias}</b> dias</span>
+      </div>`}
+
+    <div class="acoes">
+      <button class="b-neutro b-pequeno" onclick="abrirEditor('${c.id}')">✎ Abrir</button>
+      <button class="b-escuro b-pequeno" onclick="disparar('${c.id}')" ${c.rodandoAgora ? "disabled" : ""}>▶ Disparar</button>
+      ${c.emAndamento ? `<button class="b-neutro b-pequeno" onclick="pausar('${c.id}')">⏸ Pausar</button>` : ""}
+      ${l && l.total ? `<a href="/api/campanhas/${c.id}/relatorio.xlsx"><button class="b-fantasma b-pequeno">📊 Relatório</button></a>` : ""}
+      <button class="b-fantasma b-pequeno" onclick="clonar('${c.id}')">⧉ Duplicar</button>
+    </div>
+  </div>`;
+}
+
+async function clonar(id) {
+  const copiar = confirm("Duplicar esta campanha.\n\nOK = copiar também a lista de contatos (todos voltam pra fila).\nCancelar = copiar só a configuração e a mensagem.");
+  try {
+    const d = await api(`/api/campanhas/${id}/clonar`, { method: "POST", body: { copiarLista: copiar } });
+    await carregar();
+    abrirEditor(d.campanha.id);
+  } catch (e) {
+    alert(e.message);
+  }
+}
+
+async function restaurar(input) {
+  const arquivo = input.files[0];
+  if (!arquivo) return;
+  if (!confirm("Restaurar este backup? As campanhas e listas atuais serão substituídas pelas do arquivo.")) {
+    input.value = "";
+    return;
+  }
+  try {
+    const texto = await arquivo.text();
+    const d = await api("/api/restaurar", { method: "POST", body: JSON.parse(texto) });
+    mostrarAviso("avisoBackup", `Backup restaurado ✔ ${d.campanhas} campanha(s).`, "ok");
+    carregar();
+  } catch (e) {
+    mostrarAviso("avisoBackup", "Não deu pra restaurar: " + e.message, "erro");
+  }
+  input.value = "";
+}
+
+async function alternarAtivo(id, valor) {
+  try {
+    const d = await api(`/api/campanhas/${id}`, { method: "PUT", body: { ativo: valor } });
+    if (valor && !d.campanha.ativo) {
+      alert(
+        d.campanha.status === "concluida"
+          ? "Esta campanha já terminou de enviar pra lista toda.\n\nPra usar de novo: abra a campanha e clique em 'Zerar progresso', ou suba uma planilha nova."
+          : "Não deu pra ativar: esta campanha ainda não tem lista de contatos importada."
+      );
+    }
+  } catch (e) {
+    alert(e.message);
+  }
   carregar();
 }
 
-async function testar() {
-  const m = el("msgTeste");
-  m.className = "msg"; m.textContent = "Enviando teste…";
-  const r = await fetch("/api/teste", {
-    method: "POST", headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ numero: el("numeroTeste").value }),
+// ---------- editor ----------
+function montarDias() {
+  el("eDias").innerHTML = DIAS.map((d, i) =>
+    `<div class="dia ${diasSelecionados.has(i) ? "on" : ""}" onclick="alternarDia(${i})">${d}</div>`
+  ).join("");
+}
+function alternarDia(i) {
+  diasSelecionados.has(i) ? diasSelecionados.delete(i) : diasSelecionados.add(i);
+  montarDias();
+  atualizarEstimativa();
+}
+
+function addExtra(numero = "", nome = "") {
+  const div = document.createElement("div");
+  div.className = "item-numero";
+  div.innerHTML =
+    `<input type="text" placeholder="51999999999" value="${esc(numero)}" data-campo="numero">` +
+    `<input type="text" placeholder="Nome (opcional)" value="${esc(nome)}" data-campo="nome">` +
+    `<button class="b-perigo b-pequeno" onclick="this.parentElement.remove()">✕</button>`;
+  el("listaExtras").appendChild(div);
+}
+function lerExtras() {
+  return [...document.querySelectorAll("#listaExtras .item-numero")]
+    .map((d) => ({
+      numero: d.querySelector('[data-campo="numero"]').value,
+      nome: d.querySelector('[data-campo="nome"]').value,
+    }))
+    .filter((n) => n.numero.trim());
+}
+
+function abrirEditor(id) {
+  const c = id ? dados.campanhas.find((x) => x.id === id) : null;
+  editando = c || null;
+
+  el("tituloEditor").textContent = c ? c.nome : "Nova campanha";
+  el("blocoTipo").style.display = c ? "none" : "block";
+  el("eNome").value = c ? c.nome : "";
+  el("eTexto").value = c
+    ? c.texto
+    : "{Oi|Olá}, {nome}! {Passando pra avisar|Separei} uma novidade que acho que vai te interessar.\n\n_Se preferir não receber mais mensagens, responda PARE._";
+  el("eImagem").value = c ? c.imagemUrl : "";
+  el("eLink").value = c ? c.hyperlink : "";
+  el("eModo").value = c ? c.modo : "manual";
+  el("eHoraIni").value = c ? c.horaInicio : 9;
+  el("eHoraFim").value = c ? c.horaFim : 18;
+  el("eTeto").value = c ? c.tetoPorRodada : 12;
+  el("eIntervalo").value = c ? c.intervaloMin : 20;
+  el("eCooldown").value = c ? c.cooldownDias : 0;
+  el("eJanela").value = c ? c.janelaDias : 90;
+  el("eAtivo").checked = c ? c.ativo : false;
+  diasSelecionados = new Set(c ? c.diasSemana : [1, 2, 3, 4, 5]);
+  montarDias();
+
+  el("listaExtras").innerHTML = "";
+  ((c && c.numerosExtras) || []).forEach((n) => addExtra(n.numero, n.nome));
+
+  const ehBling = c && c.tipo === "bling";
+  el("cardBling").style.display = ehBling ? "block" : "none";
+  el("cardPlanilha").style.display = c && c.tipo === "planilha" ? "block" : "none";
+  el("btnExcluir").style.display = c && !ehBling ? "block" : "none";
+  el("btnDisparar").style.display = c ? "block" : "none";
+  el("btnPausar").style.display = c && c.emAndamento ? "block" : "none";
+
+  mostrarAviso("avisoPlanilha", "");
+  mostrarAviso("avisoTeste", "");
+  mostrarAviso("avisoImagem", "");
+  el("previaTexto").style.display = "none";
+  desenharResumoPlanilha(c);
+  mostrarPrevia();
+  atualizarEstimativa();
+  el("modal").classList.add("aberto");
+  document.body.style.overflow = "hidden"; // não deixa a página de trás rolar
+  el("modal").querySelector(".modal-corpo").scrollTop = 0;
+}
+
+function fecharEditor() {
+  el("modal").classList.remove("aberto");
+  document.body.style.overflow = "";
+  editando = null;
+  carregar();
+}
+
+// Esc fecha o editor
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && el("modal").classList.contains("aberto")) fecharEditor();
+});
+
+function desenharResumoPlanilha(c) {
+  if (!c || c.tipo !== "planilha") return;
+  const l = c.lista;
+  const box = el("resumoPlanilha");
+  if (!l || !l.total) {
+    box.className = "aviso neutro";
+    box.textContent = "Nenhuma planilha importada ainda.";
+    el("acoesPlanilha").style.display = "none";
+    return;
+  }
+  box.className = "aviso ok";
+  box.innerHTML =
+    `<strong>${esc(l.arquivo || "planilha")}</strong> — ${l.total} contatos · ` +
+    `${l.enviados} enviados · ${l.pendentes} na fila` +
+    (l.erros ? ` · ${l.erros} com erro` : "") +
+    (l.optout ? ` · ${l.optout} pediram PARE` : "") +
+    (l.ignoradosNaImportacao.invalidos || l.ignoradosNaImportacao.duplicados
+      ? `<br><span class="dica">na importação: ${l.ignoradosNaImportacao.invalidos} telefone(s) inválido(s) e ${l.ignoradosNaImportacao.duplicados} repetido(s) foram ignorados</span>`
+      : "");
+  el("acoesPlanilha").style.display = "flex";
+}
+
+function corpoCampanha() {
+  return {
+    nome: el("eNome").value,
+    tipo: editando ? editando.tipo : el("eTipo").value,
+    texto: el("eTexto").value,
+    imagemUrl: el("eImagem").value,
+    hyperlink: el("eLink").value,
+    modo: el("eModo").value,
+    diasSemana: [...diasSelecionados],
+    horaInicio: el("eHoraIni").value,
+    horaFim: el("eHoraFim").value,
+    tetoPorRodada: el("eTeto").value,
+    intervaloMin: el("eIntervalo").value,
+    cooldownDias: el("eCooldown").value,
+    janelaDias: el("eJanela").value,
+    numerosExtras: lerExtras(),
+    ativo: el("eAtivo").checked,
+  };
+}
+
+async function salvarCampanha() {
+  if (!el("eNome").value.trim()) return alert("Dê um nome pra campanha.");
+  try {
+    if (editando) {
+      await api(`/api/campanhas/${editando.id}`, { method: "PUT", body: corpoCampanha() });
+    } else {
+      const d = await api("/api/campanhas", { method: "POST", body: corpoCampanha() });
+      await carregar();
+      abrirEditor(d.campanha.id);
+      mostrarAviso("avisoPlanilha", "Campanha criada! Agora suba a planilha de contatos.", "ok");
+      return;
+    }
+    await carregar();
+    const atual = dados.campanhas.find((x) => x.id === editando.id);
+    editando = atual;
+    desenharResumoPlanilha(atual);
+    el("tituloEditor").textContent = atual.nome;
+    alert("Campanha salva ✔");
+  } catch (e) {
+    alert("Erro: " + e.message);
+  }
+}
+
+async function excluir() {
+  if (!editando) return;
+  if (!confirm(`Excluir a campanha "${editando.nome}" e a lista dela? Não tem volta.`)) return;
+  try {
+    await api(`/api/campanhas/${editando.id}`, { method: "DELETE" });
+    fecharEditor();
+  } catch (e) {
+    alert(e.message);
+  }
+}
+
+async function disparar(id) {
+  const alvo = id || (editando && editando.id);
+  if (!alvo) return;
+  try {
+    const d = await api(`/api/campanhas/${alvo}/disparar`, { method: "POST", body: {} });
+    alert(d.msg || "Disparo iniciado.");
+  } catch (e) {
+    if (confirm(e.message + "\n\nQuer disparar mesmo assim, fora do horário?")) {
+      try {
+        const d = await api(`/api/campanhas/${alvo}/disparar`, { method: "POST", body: { forcar: true } });
+        alert(d.msg || "Disparo iniciado.");
+      } catch (e2) {
+        alert(e2.message);
+      }
+    }
+  }
+  setTimeout(carregar, 2000);
+}
+
+async function pausar(id) {
+  const alvo = id || (editando && editando.id);
+  if (!alvo) return;
+  try {
+    await api(`/api/campanhas/${alvo}/pausar`, { method: "POST", body: {} });
+    await carregar();
+    if (editando) editando = dados.campanhas.find((x) => x.id === alvo);
+    el("btnPausar").style.display = "none";
+  } catch (e) {
+    alert(e.message);
+  }
+}
+
+// ---------- planilha ----------
+async function subirPlanilha() {
+  if (!editando) return alert("Salve a campanha primeiro.");
+  const arquivo = el("eArquivo").files[0];
+  if (!arquivo) return mostrarAviso("avisoPlanilha", "Escolha um arquivo primeiro.", "erro");
+  mostrarAviso("avisoPlanilha", "Importando…", "neutro");
+  const fd = new FormData();
+  fd.append("arquivo", arquivo);
+  try {
+    const r = await fetch(`/api/campanhas/${editando.id}/planilha`, { method: "POST", body: fd });
+    const d = await r.json();
+    if (!r.ok || d.ok === false) throw new Error(d.motivo || "erro no upload");
+    const previa = (d.previa || []).map((c) => `${c.numero}${c.nome ? " — " + c.nome : ""}`).join("<br>");
+    mostrarAviso("avisoPlanilha", "", "ok");
+    el("avisoPlanilha").innerHTML =
+      `<strong>Importado ✔</strong> ${d.resumo.total} contatos válidos.` +
+      (d.aviso ? `<br><span class="dica">⚠️ ${esc(d.aviso)}</span>` : "") +
+      (previa ? `<br><span class="dica">Primeiros contatos:<br>${previa}</span>` : "");
+    await carregar();
+    editando = dados.campanhas.find((x) => x.id === editando.id);
+    desenharResumoPlanilha(editando);
+    atualizarEstimativa();
+  } catch (e) {
+    mostrarAviso("avisoPlanilha", e.message, "erro");
+  }
+}
+
+function baixar(qual) {
+  if (!editando) return;
+  location.href = qual === "relatorio"
+    ? `/api/campanhas/${editando.id}/relatorio.xlsx`
+    : `/api/campanhas/${editando.id}/planilha`;
+}
+
+async function reiniciarLista() {
+  if (!editando) return;
+  if (!confirm("Zerar o progresso? Todos os contatos voltam pra fila e vão receber de novo (quem pediu PARE continua de fora).")) return;
+  try {
+    await api(`/api/campanhas/${editando.id}/reiniciar`, { method: "POST", body: {} });
+    await carregar();
+    editando = dados.campanhas.find((x) => x.id === editando.id);
+    desenharResumoPlanilha(editando);
+    mostrarAviso("avisoPlanilha", "Progresso zerado ✔", "ok");
+  } catch (e) {
+    mostrarAviso("avisoPlanilha", e.message, "erro");
+  }
+}
+
+async function removerPlanilha() {
+  if (!editando) return;
+  if (!confirm("Remover a lista desta campanha?")) return;
+  try {
+    await api(`/api/campanhas/${editando.id}/planilha`, { method: "DELETE" });
+    await carregar();
+    editando = dados.campanhas.find((x) => x.id === editando.id);
+    desenharResumoPlanilha(editando);
+  } catch (e) {
+    mostrarAviso("avisoPlanilha", e.message, "erro");
+  }
+}
+
+// ---------- imagem ----------
+function mostrarPrevia() {
+  const url = el("eImagem").value.trim();
+  const box = el("previaImg");
+  if (!/^https?:\/\//i.test(url)) { box.style.display = "none"; return; }
+  el("imgPrevia").src = url;
+  box.style.display = "block";
+}
+function abrirImagem() {
+  const url = el("eImagem").value.trim();
+  if (!url) return mostrarAviso("avisoImagem", "Cole o link da imagem primeiro.", "erro");
+  window.open(url, "_blank", "noopener");
+}
+async function verificarImagem() {
+  const url = el("eImagem").value.trim();
+  if (!url) return mostrarAviso("avisoImagem", "Cole o link da imagem primeiro.", "erro");
+  mostrarAviso("avisoImagem", "Verificando…", "neutro");
+  try {
+    const r = await fetch("/api/verificar-imagem?url=" + encodeURIComponent(url));
+    const d = await r.json();
+    mostrarAviso("avisoImagem", d.motivo + (d.tamanhoKb ? ` (${d.tamanhoKb} KB, ${d.tipo})` : ""), d.ok ? "ok" : "erro");
+    if (d.ok) mostrarPrevia();
+  } catch (e) {
+    mostrarAviso("avisoImagem", "Não consegui verificar: " + e.message, "erro");
+  }
+}
+
+// ---------- prévia do texto ----------
+function variar(texto) {
+  return texto.replace(/\{([^{}]*\|[^{}]*)\}/g, (_, g) => {
+    const o = g.split("|");
+    return o[Math.floor(Math.random() * o.length)].trim();
   });
-  const d = await r.json();
-  if (d.ok) { m.className = "msg ok"; m.textContent = "Teste enviado! Confere no WhatsApp."; }
-  else { m.className = "msg erro"; m.textContent = "Falhou: " + (d.motivo || "erro"); }
+}
+function verPrevia() {
+  const base = el("eTexto").value;
+  const nomes = ["Maria", "João", "Ana"];
+  const amostras = nomes.map((n) => {
+    let t = variar(base).replace(/\{nome\}/g, n);
+    if (el("eLink").value.trim()) t += "\n" + el("eLink").value.trim();
+    return `<b>${n}:</b> ${esc(t).replace(/\n/g, "<br>")}`;
+  });
+  const box = el("previaTexto");
+  box.className = "aviso neutro";
+  box.style.display = "block";
+  box.innerHTML = "Três exemplos, como cada pessoa receberia:<br><br>" + amostras.join("<br><br>");
 }
 
-async function rodarAgora() {
-  const m = el("msgTeste");
-  await fetch("/api/rodar-agora", { method: "POST" });
-  m.className = "msg ok";
-  m.textContent = "Rodada iniciada — acompanhe no log abaixo (atualiza em alguns segundos).";
-  setTimeout(carregar, 5000);
+// ---------- estimativa de tempo ----------
+function atualizarEstimativa() {
+  if (!dados) return;
+  const teto = parseInt(el("eTeto").value, 10) || 1;
+  const intervalo = Math.max(1, parseInt(el("eIntervalo").value, 10) || 1);
+  const horas = Math.max(0, (parseInt(el("eHoraFim").value, 10) || 0) - (parseInt(el("eHoraIni").value, 10) || 0));
+  const diasAtivos = Math.max(1, diasSelecionados.size);
+  const p = dados.protecao;
+
+  const rodadasPorDia = Math.floor((horas * 60) / intervalo) || 1;
+  const mediaPausa = (p.pausaMinSeg + p.pausaMaxSeg) / 2;
+  const cabeNaRodada = Math.min(teto, Math.floor((intervalo * 60) / mediaPausa) || 1);
+  const porDia = Math.max(1, Math.min(p.limiteDiario, rodadasPorDia * cabeNaRodada));
+
+  const pendentes = editando && editando.lista ? editando.lista.pendentes : null;
+  let texto = `Ritmo estimado: até <b>${porDia}</b> mensagens por dia de disparo (${diasAtivos} dia(s) por semana, ${horas}h de janela).`;
+  if (pendentes) {
+    const diasCorridos = Math.ceil(pendentes / porDia);
+    const semanas = Math.ceil((diasCorridos / diasAtivos) * 7);
+    texto += ` Com <b>${pendentes}</b> contatos na fila, a lista sai em cerca de <b>${diasCorridos} dia(s) de disparo</b>` +
+      (diasAtivos < 7 ? ` (~${semanas} dias corridos)` : "") + ".";
+  }
+  if (cabeNaRodada < teto) {
+    texto += `<br><span class="dica">Obs.: com pausa média de ${Math.round(mediaPausa)}s, só cabem ~${cabeNaRodada} mensagens dentro do intervalo de ${intervalo} min. Aumente o intervalo ou reduza a pausa se quiser usar o teto de ${teto}.</span>`;
+  }
+  const box = el("estimativa");
+  box.className = "aviso neutro";
+  box.style.display = "block";
+  box.innerHTML = texto;
 }
 
+// ---------- teste ----------
+async function enviarTeste() {
+  if (!editando) return mostrarAviso("avisoTeste", "Salve a campanha primeiro.", "erro");
+  mostrarAviso("avisoTeste", "Enviando…", "neutro");
+  try {
+    const d = await api(`/api/campanhas/${editando.id}/teste`, { method: "POST", body: { numero: el("eNumeroTeste").value } });
+    mostrarAviso("avisoTeste", "Teste enviado! Confere no WhatsApp.", "ok");
+  } catch (e) {
+    mostrarAviso("avisoTeste", "Falhou: " + e.message, "erro");
+  }
+}
+
+// ---------- opt-out ----------
+function desenharOptOut() {
+  el("contaOptOut").textContent = `${dados.optOut.length} número(s)`;
+  el("chipsOptOut").innerHTML = dados.optOut
+    .slice(-60)
+    .map((n) => `<span class="chip">${esc(n)}<button title="remover" onclick="removerOptOutDireto('${esc(n)}')">✕</button></span>`)
+    .join("");
+}
+async function mexerOptOut(remover) {
+  try {
+    await api("/api/optout", { method: "POST", body: { numero: el("numeroOptOut").value, remover } });
+    el("numeroOptOut").value = "";
+    mostrarAviso("avisoOptOut", remover ? "Removido ✔" : "Adicionado ✔", "ok");
+    carregar();
+  } catch (e) {
+    mostrarAviso("avisoOptOut", e.message, "erro");
+  }
+  setTimeout(() => mostrarAviso("avisoOptOut", ""), 3000);
+}
+async function removerOptOutDireto(numero) {
+  await api("/api/optout", { method: "POST", body: { numero, remover: true } }).catch(() => {});
+  carregar();
+}
+
+// ---------- contador de caracteres ----------
+el("eTexto").addEventListener("input", () => {
+  const t = el("eTexto").value;
+  el("contadorTexto").textContent = `${t.length} caracteres`;
+});
+
+// ---------- inicia ----------
+montarDias();
 carregar();
-setInterval(carregar, 30000); // atualiza o log a cada 30s
+setInterval(() => {
+  if (!el("modal").classList.contains("aberto")) carregar();
+}, 20000);
 </script>
 </body>
 </html>
