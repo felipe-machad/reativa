@@ -9,7 +9,7 @@
 // (telefone / celular / whatsapp / fone / numero…).
 // Sem nenhuma dependência: o .xlsx é lido/gerado pelo xlsx-lite.
 // ============================================================
-const { lerXlsx, criarXlsx } = require("./xlsx-lite");
+const { lerAbas, criarXlsx } = require("./xlsx-lite");
 const { formatarNumero } = require("./evolution");
 
 // nomes de cabeçalho aceitos, em ordem de preferência
@@ -100,19 +100,21 @@ function lerCsv(texto) {
   return limpas;
 }
 
-function paraMatriz(buffer, nomeArquivo) {
+// devolve sempre uma lista de abas: [{ nome, matriz }].
+// CSV tem uma "aba" só; planilha do Excel pode ter várias.
+function paraAbas(buffer, nomeArquivo) {
   const ext = extensaoDe(nomeArquivo);
-  if (ext === ".xlsx" || ext === ".xlsm") return lerXlsx(buffer);
+  if (ext === ".xlsx" || ext === ".xlsm") return lerAbas(buffer);
   if (ext === ".xls") {
-    // .xls antigo (binário) não é suportado — o arquivo é um formato diferente
+    // .xls antigo (binário, pré-2007) é outro formato
     if (buffer.subarray(0, 2).toString("hex") !== "504b") {
       throw new Error(
         "Arquivo .xls antigo não é suportado. Abra no Excel e salve como .xlsx (ou CSV) antes de subir."
       );
     }
-    return lerXlsx(buffer);
+    return lerAbas(buffer);
   }
-  return lerCsv(decodificarTexto(buffer));
+  return [{ nome: "csv", matriz: lerCsv(decodificarTexto(buffer)) }];
 }
 
 function acharColuna(linha, alvos) {
@@ -134,13 +136,31 @@ function pareceTelefone(v) {
 }
 
 /**
- * Lê os contatos de uma planilha.
- * @returns {{contatos, total, invalidos, duplicados, colunas, aviso, exemplosInvalidos}}
+ * Lê os contatos de uma planilha. Se o arquivo tiver várias abas, usa a
+ * primeira que tenha uma coluna de telefone com algo válido dentro.
+ * @returns {{contatos, total, invalidos, duplicados, colunas, aviso, exemplosInvalidos, aba}}
  */
 function lerContatos(buffer, nomeArquivo) {
-  const matriz = paraMatriz(buffer, nomeArquivo);
-  if (!matriz.length) throw new Error("A planilha não tem nenhuma linha com conteúdo.");
+  const abas = paraAbas(buffer, nomeArquivo).filter((a) => a.matriz && a.matriz.length);
+  if (!abas.length) throw new Error("A planilha não tem nenhuma linha com conteúdo.");
 
+  let ultimoErro = null;
+  for (let i = 0; i < abas.length; i++) {
+    try {
+      const r = extrairDaMatriz(abas[i].matriz);
+      if (abas.length > 1 && i > 0) {
+        r.aviso = `Os contatos foram lidos da aba "${abas[i].nome}".` + (r.aviso ? " " + r.aviso : "");
+      }
+      r.aba = abas[i].nome;
+      return r;
+    } catch (e) {
+      ultimoErro = e;
+    }
+  }
+  throw ultimoErro;
+}
+
+function extrairDaMatriz(matriz) {
   let idxTel = -1;
   let idxNome = -1;
   let linhaInicial = 0;

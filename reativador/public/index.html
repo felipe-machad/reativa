@@ -402,7 +402,16 @@ function mostrarAviso(id, texto, tipo = "neutro") {
   const a = el(id);
   a.className = "aviso " + tipo;
   a.textContent = texto;
-  if (!texto) a.style.display = "none";
+  // sempre explícito: sem isso, um aviso escondido antes nunca voltava a aparecer
+  a.style.display = texto ? "block" : "none";
+}
+
+// mesma coisa, mas aceitando HTML (usado nos resumos com negrito e quebras)
+function mostrarAvisoHtml(id, html, tipo = "neutro") {
+  const a = el(id);
+  a.className = "aviso " + tipo;
+  a.innerHTML = html;
+  a.style.display = html ? "block" : "none";
 }
 
 async function api(caminho, opcoes = {}) {
@@ -700,22 +709,22 @@ document.addEventListener("keydown", (e) => {
 function desenharResumoPlanilha(c) {
   if (!c || c.tipo !== "planilha") return;
   const l = c.lista;
-  const box = el("resumoPlanilha");
   if (!l || !l.total) {
-    box.className = "aviso neutro";
-    box.textContent = "Nenhuma planilha importada ainda.";
+    mostrarAvisoHtml("resumoPlanilha", "Nenhuma planilha importada ainda.", "neutro");
     el("acoesPlanilha").style.display = "none";
     return;
   }
-  box.className = "aviso ok";
-  box.innerHTML =
+  mostrarAvisoHtml(
+    "resumoPlanilha",
     `<strong>${esc(l.arquivo || "planilha")}</strong> — ${l.total} contatos · ` +
     `${l.enviados} enviados · ${l.pendentes} na fila` +
     (l.erros ? ` · ${l.erros} com erro` : "") +
     (l.optout ? ` · ${l.optout} pediram PARE` : "") +
     (l.ignoradosNaImportacao.invalidos || l.ignoradosNaImportacao.duplicados
       ? `<br><span class="dica">na importação: ${l.ignoradosNaImportacao.invalidos} telefone(s) inválido(s) e ${l.ignoradosNaImportacao.duplicados} repetido(s) foram ignorados</span>`
-      : "");
+      : ""),
+    "ok"
+  );
   el("acoesPlanilha").style.display = "flex";
 }
 
@@ -818,11 +827,13 @@ async function subirPlanilha() {
     const d = await r.json();
     if (!r.ok || d.ok === false) throw new Error(d.motivo || "erro no upload");
     const previa = (d.previa || []).map((c) => `${c.numero}${c.nome ? " — " + c.nome : ""}`).join("<br>");
-    mostrarAviso("avisoPlanilha", "", "ok");
-    el("avisoPlanilha").innerHTML =
+    mostrarAvisoHtml(
+      "avisoPlanilha",
       `<strong>Importado ✔</strong> ${d.resumo.total} contatos válidos.` +
-      (d.aviso ? `<br><span class="dica">⚠️ ${esc(d.aviso)}</span>` : "") +
-      (previa ? `<br><span class="dica">Primeiros contatos:<br>${previa}</span>` : "");
+        (d.aviso ? `<br><span class="dica">⚠️ ${esc(d.aviso)}</span>` : "") +
+        (previa ? `<br><span class="dica">Primeiros contatos:<br>${previa}</span>` : ""),
+      "ok"
+    );
     await carregar();
     editando = dados.campanhas.find((x) => x.id === editando.id);
     desenharResumoPlanilha(editando);

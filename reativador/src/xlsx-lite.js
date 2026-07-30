@@ -205,9 +205,11 @@ function numeroParaTexto(v) {
 }
 
 // ---------------------------------------------------------------
-// LEITURA DE .XLSX -> matriz de strings
+// LEITURA DE .XLSX
+//   lerAbas(buffer)  -> [{ nome, matriz }] na ordem do arquivo
+//   lerXlsx(buffer)  -> matriz da primeira aba (atalho)
 // ---------------------------------------------------------------
-function lerXlsx(buffer) {
+function lerAbas(buffer) {
   const zip = lerZip(buffer);
 
   // textos compartilhados
@@ -218,25 +220,35 @@ function lerXlsx(buffer) {
     for (const m of xml.matchAll(/<si>([\s\S]*?)<\/si>/g)) compartilhados.push(textoDosT(m[1]));
   }
 
-  // descobre qual arquivo é a primeira aba (na ordem do workbook)
-  let caminhoAba = null;
+  // descobre as abas na ordem do workbook (nome + arquivo de cada uma)
+  const abas = [];
   const wb = zip.get("xl/workbook.xml");
   const rels = zip.get("xl/_rels/workbook.xml.rels");
   if (wb && rels) {
-    const primeiro = wb.toString("utf8").match(/<sheet\b[^>]*r:id="([^"]+)"/);
-    if (primeiro) {
-      const rel = rels
-        .toString("utf8")
-        .match(new RegExp(`<Relationship[^>]*Id="${primeiro[1]}"[^>]*Target="([^"]+)"`));
-      if (rel) caminhoAba = ("xl/" + rel[1].replace(/^\/?xl\//, "").replace(/^\//, "")).replace(/\/{2,}/g, "/");
+    const textoRels = rels.toString("utf8");
+    for (const m of wb.toString("utf8").matchAll(/<sheet\b([^>]*)\/?>/g)) {
+      const attrs = m[1];
+      const idRel = (attrs.match(/r:id="([^"]+)"/) || [])[1];
+      const nome = desescapar((attrs.match(/name="([^"]*)"/) || [])[1] || "");
+      if (!idRel) continue;
+      const rel = textoRels.match(new RegExp(`<Relationship[^>]*Id="${idRel}"[^>]*Target="([^"]+)"`));
+      if (!rel) continue;
+      const caminho = ("xl/" + rel[1].replace(/^\/?xl\//, "").replace(/^\//, "")).replace(/\/{2,}/g, "/");
+      if (zip.has(caminho)) abas.push({ nome, caminho });
     }
   }
-  if (!caminhoAba || !zip.has(caminhoAba)) {
-    caminhoAba = [...zip.keys()].find((k) => /^xl\/worksheets\/.*\.xml$/.test(k));
+  if (!abas.length) {
+    for (const k of zip.keys()) if (/^xl\/worksheets\/.*\.xml$/.test(k)) abas.push({ nome: k, caminho: k });
   }
-  if (!caminhoAba) throw new Error("Não achei nenhuma aba dentro do arquivo .xlsx.");
+  if (!abas.length) throw new Error("Não achei nenhuma aba dentro do arquivo .xlsx.");
 
-  const xml = zip.get(caminhoAba).toString("utf8");
+  return abas.map(({ nome, caminho }) => ({
+    nome,
+    matriz: lerMatriz(zip.get(caminho).toString("utf8"), compartilhados),
+  }));
+}
+
+function lerMatriz(xml, compartilhados) {
   const matriz = [];
 
   for (const linhaMatch of xml.matchAll(/<row\b([^>]*)>([\s\S]*?)<\/row>/g)) {
@@ -286,6 +298,12 @@ function lerXlsx(buffer) {
 function textoEntre(xml, tag) {
   const m = xml.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}>`));
   return m ? m[1] : null;
+}
+
+// atalho: matriz da primeira aba
+function lerXlsx(buffer) {
+  const abas = lerAbas(buffer);
+  return abas.length ? abas[0].matriz : [];
 }
 
 // ---------------------------------------------------------------
@@ -398,4 +416,4 @@ ${lista
   return criarZip(entradas);
 }
 
-module.exports = { lerXlsx, criarXlsx, lerZip, criarZip };
+module.exports = { lerXlsx, lerAbas, criarXlsx, lerZip, criarZip };

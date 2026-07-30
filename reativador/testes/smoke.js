@@ -134,6 +134,23 @@ ok("relatório gera duas abas legíveis", () => {
   assert.equal(matriz[0][1], "Teste");
   fs.writeFileSync("/tmp/relatorio-teste.xlsx", buf);
 });
+ok("acha os contatos mesmo quando estão na 2ª aba", () => {
+  const buf = criarXlsx([
+    { nome: "instruções", linhas: [["Leia antes de preencher"], ["Preencha a aba ao lado."]] },
+    { nome: "contatos", linhas: [["telefone", "nome"], ["51999990001", "Maria"], ["11988887777", "João"]] },
+  ]);
+  const r = lerContatos(buf, "lista.xlsx");
+  assert.equal(r.total, 2);
+  assert.equal(r.aba, "contatos");
+  assert.match(r.aviso, /aba "contatos"/);
+});
+ok("planilha sem telefone em nenhuma aba dá erro claro", () => {
+  const buf = criarXlsx([
+    { nome: "a", linhas: [["produto", "preço"], ["camiseta", "79,90"]] },
+    { nome: "b", linhas: [["obs"], ["nada aqui"]] },
+  ]);
+  assert.throws(() => lerContatos(buf, "x.xlsx"), /Nenhum telefone válido/);
+});
 ok("arquivo corrompido dá erro amigável", () => {
   assert.throws(() => lerXlsx(Buffer.from("não sou um zip")), /inválido/i);
 });
